@@ -41,7 +41,10 @@ const loginGet = (req, res) => {
 }
 
 const loginPost =  async (req, res) => {
-  res.send("New login")
+  const { email, password } = req.body;
+
+  console.log(email, password);
+  res.send('user login');
 }
 
 module.exports = {
