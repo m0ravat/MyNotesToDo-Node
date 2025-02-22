@@ -14,7 +14,7 @@ mongoose.connect(dbURI)
 
 // register view engine
 app.set('view engine', 'ejs');
-
+app.use(express.json());
 // middleware & static files
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
@@ -29,17 +29,10 @@ app.get('/', (req, res) => {
   res.render("index", {title: "Home Page"});
 });
 
-app.get("/signup", (req,res) => {
-  res.render("signup", {title: "Sign Up"});
-})
-
-app.get("/login", (req, res) =>{
-  res.render("login", {title: "Login Page"})
-})
-
+app.use(userRouter);
 // 404 page
 app.use((req, res) => {
   res.status(404).render('404', { title: '404' });
 });
 
-app.use('/user', userRouter);
+
