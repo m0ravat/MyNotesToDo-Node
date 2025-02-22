@@ -1,15 +1,15 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
-
+const userRouter = require('./Routes/userRoutes');
 // express app
 const app = express();
 
 // connect to mongodb & listen for requests
-const dbURI = "mongodb+srv://netninja:test1234@net-ninja-tuts-del96.mongodb.net/node-tuts";
+const dbURI = "mongodb+srv://m0ravat:Langdon1%4012@mynotestodo.heq52.mongodb.net/MyNotesToDo?retryWrites=true&w=majority";
 
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(result => app.listen(3000))
+mongoose.connect(dbURI)
+  .then(result => app.listen(3000, () => console.log('Server is running on port 3000')))
   .catch(err => console.log(err));
 
 // register view engine
@@ -26,10 +26,20 @@ app.use((req, res, next) => {
 
 // routes
 app.get('/', (req, res) => {
+  res.render("index", {title: "Home Page"});
 });
 
+app.get("/signup", (req,res) => {
+  res.render("signup", {title: "Sign Up"});
+})
+
+app.get("/login", (req, res) =>{
+  res.render("login", {title: "Login Page"})
+})
 
 // 404 page
 app.use((req, res) => {
   res.status(404).render('404', { title: '404' });
 });
+
+app.use('/user', userRouter);
