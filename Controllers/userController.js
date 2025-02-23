@@ -3,11 +3,18 @@ const jwt = require('jsonwebtoken');
 
 const handleErrors = (err) => {
   let errors = { email: "", password: "" };
+  if (err.message === 'Incorrect email') {
+    errors.email = 'That email is not registered';
+  }
+
+  // incorrect password
+  if (err.message === 'Incorrect password') {
+    errors.password = 'That password is incorrect';
+  }
   if (err.code === 11000){
     errors.email = "That email is already registered on our database";
   }
   console.log(err.message, err.code);
-  console.log("Validation errors:", err.errors);  // Log the full error object to inspect it
 
 
   if (err.message.includes("User validation failed")) {
@@ -50,9 +57,17 @@ const loginGet = (req, res) => {
 
 const loginPost =  async (req, res) => {
   const { email, password } = req.body;
+  try{
+    const user = await User.login(email, password);
+    const token = createToken(user._id);
+    res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge1 * 1000 });
+    res.status(200).json({user : user._id});
+  }
+  catch (err) {
+    const errors = handleErrors(err);
+    res.status(400).json({errors});
+  }
 
-  console.log(email, password);
-  res.send('user login');
 }
 
 module.exports = {
