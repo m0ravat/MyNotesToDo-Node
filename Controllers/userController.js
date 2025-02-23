@@ -1,7 +1,9 @@
 const User = require('../Models/user');
+const jwt = require('jsonwebtoken');
+
 const handleErrors = (err) => {
   let errors = { email: "", password: "" };
-  if (err.code ==11000){
+  if (err.code === 11000){
     errors.email = "That email is already registered on our database";
   }
   console.log(err.message, err.code);
@@ -18,6 +20,10 @@ const handleErrors = (err) => {
   return errors;
 };
 
+const maxAge1 = 3*24*60*60; //3 days in seconds
+const createToken = (id) =>{
+  return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn : maxAge1 });
+}
 
 const signupGet = (req, res) => {
   res.render('signup', { title: 'Create a new user' });
@@ -28,7 +34,9 @@ const signupPost = async (req, res) => {
 
   try{
     const user = await User.create({email, password});
-    res.status(201).json(user);
+    const token = createToken(user._id);
+    res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge1 * 1000 });
+    res.status(201).json({user: user._id});
   }
   catch(err){
     const errors = handleErrors(err);

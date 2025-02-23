@@ -3,6 +3,8 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const userRouter = require('./Routes/userRoutes');
 const cookieParser = require('cookie-parser');
+require('dotenv').config();
+
 // express app
 const app = express();
 
@@ -20,7 +22,7 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
-app.use(cookieParser);
+app.use(cookieParser());
 app.use((req, res, next) => {
   res.locals.path = req.path;
   next();
