@@ -2,12 +2,13 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const userRouter = require('./Routes/userRoutes');
+const projectRouter = require('./Routes/projectRoutes');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const app = express();
 const dbURI = "mongodb+srv://m0ravat:Langdon1%4012@mynotestodo.heq52.mongodb.net/MyNotesToDo?retryWrites=true&w=majority";
-const {requireAuth} = require('./Middleware/authMiddleware');
+const {requireAuth, checkUser} = require('./Middleware/authMiddleware');
 mongoose.connect(dbURI)
   .then(result => app.listen(3000, () => console.log('Server is running on port 3000')))
   .catch(err => console.log(err));
@@ -44,12 +45,13 @@ app.get("/read-cookies", (req,res) =>{
 })
 
 // routes
+app.get('*', checkUser);
 app.get('/', (req, res) => {
   res.render("index", {title: "Home Page"});
 });
 
 app.use(userRouter);
-app.get('/projects', requireAuth, (req,res) => {res.render('projectDetails', {title: "Projects Page"})});
+app.use('/project', requireAuth, projectRouter);
 app.use((req, res) => {
   res.status(404).render('404', { title: '404' });
 });

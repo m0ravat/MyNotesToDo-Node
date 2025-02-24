@@ -1,14 +1,23 @@
 <div class="wrapper">
   <div class="sidebar" id="sode">
-      <h2>MyNotesToDo</h2>
+    <h2>MyNotesToDo</h2>
+    <% if (user){%>  <h2 class="text-white mb-10">Hi, <%= user.username %></h2> <%}%>
       <ul id="first" class="top-0">
           <li id="home"><a href="/"><i class="fas fa-home"></i>  Home</a></li>
-
       </ul>
+      <% if (user) {%>
+        <ul id="list">
+          
+        </ul>
+      <% } %>
       <ul id="second">
-        <li><a href="/logout"><i></i>Sign out</a></li>
-        <li><a href="/login"><i class="fas fa-home"></i>Login</a></li>
-        <li><a href="/signup"><i class="fas fa-home"></i>Signup</a></li>
+        <% if (user) { %>
+          <li class="text-white"><i class="fas fa-pen"><a href="/project">Create new project</i></a></li>
+          <li class="mb-6"><a href="/logout">Logout</a></li>
+        <% } else{ %>
+          <li><a href="/login"><i class="fas fa-home"></i>Login</a></li>
+          <li><a href="/signup"><i class="fas fa-home"></i>Signup</a></li>
+        <% } %>
       </ul>
       <div class="social_media">
         <a href="https://www.linkedin.com/in/muhammad-ravat" target="_blank"><i class="fab fa-linkedin"></i></a>

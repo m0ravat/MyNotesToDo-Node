@@ -616,6 +616,26 @@ video {
   top: 0px;
 }
 
+.mb-10 {
+  margin-bottom: 2.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-20 {
+  margin-bottom: 5rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mt-10 {
+  margin-top: 2.5rem;
+}
+
 .block {
   display: block;
 }
@@ -672,6 +692,10 @@ video {
   border-width: 1px;
 }
 
+.pb-10 {
+  padding-bottom: 2.5rem;
+}
+
 .text-center {
   text-align: center;
 }
@@ -681,12 +705,22 @@ video {
   line-height: 1.75rem;
 }
 
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
 .lowercase {
   text-transform: lowercase;
 }
 
 .capitalize {
   text-transform: capitalize;
+}
+
+.text-white {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
 .underline {
@@ -1028,7 +1062,6 @@ li a{
 #second li {
   position: static;
   display: flex;
-  margin-bottom: 25px;
   font-size: 20px;
   padding: 15px;
   border-bottom: 1px solid #bdb8d7;
@@ -1079,6 +1112,7 @@ a{
 }
 
 main#content {
+  min-width: 270px;
   width: calc(100% - 150px);
   /* Subtract the left margin to avoid overflow */
   margin-left: 150px;

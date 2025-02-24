@@ -1,0 +1,59 @@
+<html lang="en">
+  <%- include("./partials/head.ejs") %>
+
+  <body>
+    <%- include("./partials/NavigationBars/nav.ejs") %>
+    <div class="create-blog content">
+      <form action="/project/create">
+        <label for="title">Project Title: </label>
+        <input type="text" name="title" id="title" required>
+        <div class="title error"></div>
+        
+        <label for="description">Project Description: </label>
+        <textarea name="description" id="description" required></textarea>
+        <div class="description error"></div>
+        
+        <button>Submit</button>
+      </form>
+    </div>
+    
+    <script>
+      const form = document.querySelector('form');
+      const titleError = document.querySelector('.title.error');
+      const descriptionError = document.querySelector('.description.error');
+    
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        // reset errors
+        titleError.textContent = "";
+        descriptionError.textContent = "";
+        
+        // get values
+        const title = form.title.value;
+        const description = form.description.value;
+    
+        try {
+          const res = await fetch('/project/create', {
+            method: 'POST',
+            body: JSON.stringify({ title, description }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+          const data = await res.json();
+          console.log(data);
+          
+          if (data.errors) {
+            titleError.textContent = data.errors.title;
+            descriptionError.textContent = data.errors.description;
+          }
+          
+          if (data.project) {
+            location.assign('/'); // Redirect after successful project creation
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      });
+    </script>
+  </body>
+</html>

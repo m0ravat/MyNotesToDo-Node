@@ -2,7 +2,7 @@ const User = require('../Models/user');
 const jwt = require('jsonwebtoken');
 
 const handleErrors = (err) => {
-  let errors = { email: "", password: "" };
+  let errors = { email: "", password: "", username: "" };
   if (err.message === 'Incorrect email') {
     errors.email = 'That email is not registered';
   }
@@ -37,10 +37,10 @@ const signupGet = (req, res) => {
 }
 
 const signupPost = async (req, res) => {
-  const {email, password} = req.body;
+  const {email, password, username} = req.body;
 
   try{
-    const user = await User.create({email, password});
+    const user = await User.create({email, password, username});
     const token = createToken(user._id);
     res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge1 * 1000 });
     res.status(201).json({user: user._id});

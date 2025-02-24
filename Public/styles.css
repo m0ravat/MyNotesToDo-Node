@@ -293,7 +293,6 @@ li a{
   #second li {
     position: static;
     display: flex;
-    margin-bottom: 25px;
     font-size: 20px;
     padding: 15px;
     border-bottom: 1px solid #bdb8d7;
@@ -346,6 +345,7 @@ a{
   
   
 main#content {
+    min-width: 270px;
     width: calc(100% - 150px); /* Subtract the left margin to avoid overflow */
     margin-left: 150px;
     margin-top: 20px;

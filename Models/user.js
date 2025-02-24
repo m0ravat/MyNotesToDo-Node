@@ -14,7 +14,15 @@ const userSchema = new Schema({
     type: String,
     required: [true, "Please enter a password"],
     minlength: [6, "Minimum length is 6 characters"]
-  }
+  },
+  username : {
+    type: String,
+    required: [true, "Please enter a username"],
+    unique: true,
+    lowercase: true
+  },
+  projects: [{ type: mongoose.Types.ObjectId, ref: 'Project' }]
+
 });
 
 userSchema.post('save', function(doc, next){
