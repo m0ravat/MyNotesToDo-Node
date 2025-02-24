@@ -7,7 +7,7 @@
       <form action="/project/create">
         <label for="title">Project Title: </label>
         <input type="text" name="title" id="title" required>
-        <div class="title error"></div>
+        <div class="title error overflow-hidden"></div>
         
         <label for="description">Project Description: </label>
         <textarea name="description" id="description" required></textarea>
@@ -16,7 +16,6 @@
         <button>Submit</button>
       </form>
     </div>
-    
     <script>
       const form = document.querySelector('form');
       const titleError = document.querySelector('.title.error');
@@ -27,28 +26,32 @@
         // reset errors
         titleError.textContent = "";
         descriptionError.textContent = "";
-        
+    
         // get values
         const title = form.title.value;
         const description = form.description.value;
+        const createdBy = "<%= user._id %>"; 
     
         try {
           const res = await fetch('/project/create', {
             method: 'POST',
-            body: JSON.stringify({ title, description }),
-            headers: { 'Content-Type': 'application/json' }
+            body: JSON.stringify({ title, description, createdBy}),
+            headers: { 
+              'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin' // Ensure cookies are sent with the request
           });
-          
+    
           const data = await res.json();
           console.log(data);
-          
+    
           if (data.errors) {
             titleError.textContent = data.errors.title;
             descriptionError.textContent = data.errors.description;
           }
-          
+    
           if (data.project) {
-            location.assign('/'); // Redirect after successful project creation
+            location.assign(`/project/${data.project._id}`); // Redirect to the created project page
           }
         } catch (err) {
           console.log(err);

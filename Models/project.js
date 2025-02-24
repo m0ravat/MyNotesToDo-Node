@@ -16,7 +16,9 @@ const projectSchema = new Schema({
     required: [true, "Please enter a description"],
     maxlength: [100, "Maximum length is 100 characters"],
   },
-  cards: [{ type: mongoose.Types.ObjectId, ref: 'Card' }]
+  cards: [{ type: mongoose.Types.ObjectId, ref: 'Card' }],
+  createdBy: { type: mongoose.Types.ObjectId, ref: 'User', required: true }
+
 
 });
 

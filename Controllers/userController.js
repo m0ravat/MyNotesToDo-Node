@@ -72,6 +72,7 @@ const loginPost =  async (req, res) => {
 
 const logoutGet = (req,res) => {
   res.cookie('jwt', '', {maxAge : 1});
+  console.log("User logged out");
   res.redirect('/');
 }
 

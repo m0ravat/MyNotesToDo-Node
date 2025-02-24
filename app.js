@@ -45,10 +45,12 @@ app.get("/read-cookies", (req,res) =>{
 })
 
 // routes
-app.get('*', checkUser);
+app.get('/*', checkUser);
+
 app.get('/', (req, res) => {
   res.render("index", {title: "Home Page"});
 });
+
 
 app.use(userRouter);
 app.use('/project', requireAuth, projectRouter);

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../Models/user');
+const Project = require('../Models/project');
 const requireAuth = (req,res,next) => {
     const token = req.cookies.jwt;
 
@@ -10,6 +11,7 @@ const requireAuth = (req,res,next) => {
                 console.log(err.message);
             } else{
                 console.log(decodedToken)
+                req.user = decodedToken;
                 next();
             }
         })
@@ -38,6 +40,28 @@ const checkUser = (req,res,next) => {
     else{
         res.locals.user= null;
         next();
+
     }
 }
-module.exports= {requireAuth, checkUser}
+const validateProject = async (req, res, next) => {
+    const user = res.locals.user;
+
+    if (!user) return res.redirect('/login');
+
+    try {
+        const project = await Project.findById(req.params.id);
+        console.log(project);
+        if (!project) return res.status(404).send('Project not found');
+
+        // Correct field name
+        if (!project.createdBy.equals(user._id)) return res.status(403).send('Unauthorized');
+
+        res.locals.project = project;
+        next();
+    } catch (err) {
+        console.log(err.message, "Valid auth");
+        res.redirect('/');
+    }
+};
+
+module.exports= {requireAuth, checkUser, validateProject}
