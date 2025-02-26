@@ -6,8 +6,14 @@
           <li id="home"><a href="/"><i class="fas fa-home"></i>  Home</a></li>
       </ul>
       <% if (user) {%>
-        <ul id="list">
-          
+        <ul id="list" class="text-white">
+          <% user.projects.forEach(project => { %>
+            <li>
+              <a href="/project/<%= project._id %>">
+                <i class="fas fa-folder"></i> <%= project.title %>
+              </a>
+            </li>
+          <% }); %>
         </ul>
       <% } %>
       <ul id="second">

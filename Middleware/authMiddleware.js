@@ -31,7 +31,7 @@ const checkUser = (req,res,next) => {
                 next();
             } else{
                 console.log(decodedToken)
-                let user = await User.findById(decodedToken.id);
+                let user = await User.findById(decodedToken.id).populate("projects");
                 res.locals.user= user;
                 next();
             }
@@ -42,6 +42,10 @@ const checkUser = (req,res,next) => {
         next();
 
     }
+}
+const laog  = (req, res, next) => {
+    console.log("Logging in");
+    next();
 }
 const validateProject = async (req, res, next) => {
     const user = res.locals.user;
@@ -64,4 +68,4 @@ const validateProject = async (req, res, next) => {
     }
 };
 
-module.exports= {requireAuth, checkUser, validateProject}
+module.exports= {requireAuth, checkUser, validateProject, laog}

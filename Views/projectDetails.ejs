@@ -12,7 +12,7 @@
                 <button id="save" class="absolute -left-24 bottom-0">
                     <span class="material-symbols-outlined">save</span>
                 </button>
-                <button id="delete" class="absolute -top-36 -left-12">
+                <button id="delete" class="absolute -top-36 -left-12" data-project-id="<%= id %>">
                     <span class="material-symbols-outlined">delete</span>
                 </button>
                 <button id="pen" class="absolute -top-32 -left-20">
@@ -50,16 +50,51 @@
                 }
             });
 
-            saveButton.addEventListener('click', function(){
-                const headerValue = headerElement.innerText;
-                const paraValue = paraElement.innerText;
+            saveButton.addEventListener('click', async function(){
+                const headerValue = header.innerText;
+                const paraValue = para.innerText;
+                const projectId = "<%=id  %>";
+                try{
+                    const response = await fetch(`/project/${projectId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            title: headerValue,
+                            description: paraValue,
+                        }),
+                    });
+                    if (response.ok){
+                        console.log("Project updated");
+                    } else {
+                        console.error("Failed to update project");
+                    }
+                } catch (error){
+                    console.error(error);
+                }
             });
-            deleteButton.addEventListener('click', function(){
+            deleteButton.addEventListener('click', async function() {
+                const projectId = deleteButton.getAttribute('data-project-id');
+
                 const userConfirmed = confirm("Are you sure you want to delete this project?");
                 if (userConfirmed) {
-                    console.log("Project deleted");
-                }                
-            })
+                    const projectId = "<%=id  %>";
+                    try {
+                        const response = await fetch(`/project/${projectId}`, {
+                            method: 'DELETE',
+                        });
+                        if (response.ok) {
+                            console.log("Project deleted");
+                            window.location.href = '/';
+                        } else {
+                            console.error("Failed to delete project");
+                        }
+                    } catch (error) {
+                        console.error("Error deleting project:", error);
+                    }
+                }
+            });            
             penButton.addEventListener('click', function(){
                 iconContainer.style.display = 'none';
                 const form = document.getElementById('form');
