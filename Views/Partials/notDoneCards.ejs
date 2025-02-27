@@ -7,14 +7,16 @@
       <div class="bg-amber-400 rounded-lg border-t-2 border-amber-500 flex flex-col justify-between h-72" id="card-<%= card._id %>">
         <!-- Title Section -->
         <div class="p-2 border-b-2 border-black">
-            <div class="font-semibold text-gray-800 p-2 text-lg" contenteditable="true">
+            <div class="font-semibold text-gray-800 p-2 text-lg title" contenteditable="true">
               <%= card.title || "Untitled" %>
             </div>
           </div>
         
         <!-- Description in the Middle -->
-        <div class="p-3 flex-grow" contenteditable="true">
-          <%= card.description ? card.description.replace(/\n/g, '<br>') : "" %>
+         <div class="unique" style="display: none;"><%= card.done  %>
+         </div>
+        <div class="p-3 flex-grow para " style="overflow-y: scroll;" contenteditable="true">
+          <%= card.description %>
         </div>
         
         <div class="flex items-center justify-between p-3 border-t border-amber-500">
@@ -30,11 +32,14 @@
             </select>
           </div>
           <div class="flex space-x-3">
-            <button class="p-1.5 bg-green-500 text-white rounded-md hover:bg-green-600">
+            <button class="p-1.5 bg-green-500 text-white rounded-md hover:bg-green-600 check" data-card-id="<%= card._id %>">
               <span class="material-symbols-outlined text-lg">check</span>
             </button>
-            <button class="p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600">
+            <button class="p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600 deletez" data-card-id="<%= card._id %>">
               <span class="material-symbols-outlined text-lg">delete</span>
+            </button>
+            <button class="p-1.5 bg-black text-white rounded-md save" data-card-id="<%= card._id %>">
+              <span class="material-symbols-outlined text-lg">save</span>
             </button>
           </div>
         </div>
@@ -44,6 +49,137 @@
 <% } else { %>
   <p class="text-gray-500">No tasks to display.</p>
 <% } %>
+
+<script>
+function attachEventListeners() {
+  // Attach event listeners to .check buttons
+  document.querySelectorAll('.check').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      const cardId = button.getAttribute('data-card-id');
+      const cardElement = document.getElementById(`card-${cardId}`);
+
+      if (!cardElement) {
+        console.error(`Card element with ID "card-${cardId}" not found`);
+        return;
+      }
+
+      // Extract the updated title and description from the card
+      const title = cardElement.querySelector('.title').innerText;
+      const description = cardElement.querySelector('.para').innerHTML;
+      const priority = cardElement.querySelector(`#priority-${cardId}`).value;
+
+      // Prepare the body of the request
+      const body = JSON.stringify({
+        title: title,
+        description: description,
+        priority: parseInt(priority), // Ensure priority is a number
+        done: true, // Mark the card as done
+      });
+
+      // Send the PUT request
+      try {
+        const response = await fetch(`/project/${parentProject}/${cardId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: body,
+        });
+
+        // Reload the page if the request is successful
+        if (response.ok) {
+          console.log('Card updated successfully');
+          window.location.href = `/project/${parentProject}`;
+        } else {
+          console.error('Failed to update the card');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  });
+  document.querySelectorAll('.deletez').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      const cardId = button.getAttribute('data-card-id');
+      const cardElement = document.getElementById(`card-${cardId}`);
+
+      if (!cardElement) {
+        console.error(`Card element with ID "card-${cardId}" not found`);
+        return;
+      }
+
+      // Send the DELETE request
+      try {
+        const response = await fetch(`/project/${parentProject}/${cardId}`, {
+          method: 'DELETE',
+        });
+
+        // Reload the page if the request is successful
+        if (response.ok) {
+          console.log('Card deleted successfully');
+          window.location.href = `/project/${parentProject}`;
+        } else {
+          console.error('Failed to delete the card');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    })
+  })
+  // Attach event listeners to .save buttons
+  document.querySelectorAll('.save').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      const cardId = button.getAttribute('data-card-id');
+      const cardElement = document.getElementById(`card-${cardId}`);
+
+      if (!cardElement) {
+        console.error(`Card element with ID "card-${cardId}" not found`);
+        return;
+      }
+
+      // Extract the updated title and description from the card
+      const title = cardElement.querySelector('.title').innerText;
+      const description = cardElement.querySelector('.para').innerHTML;
+      const priority = cardElement.querySelector(`#priority-${cardId}`).value;
+      const done = cardElement.querySelector('.unique').innerHTML;
+
+      // Prepare the body of the request
+      const body = JSON.stringify({
+        title: title,
+        description: description,
+        priority: parseInt(priority), // Ensure priority is a number
+        done: done === 'true', // Convert string to boolean
+      });
+
+      // Send the PUT request
+      try {
+        const response = await fetch(`/project/${parentProject}/${cardId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: body,
+        });
+
+        // Reload the page if the request is successful
+        if (response.ok) {
+          console.log('Card updated successfully');
+          window.location.href = `/project/${parentProject}`;
+        } else {
+          console.error('Failed to update the card');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  });
+}
+
+// Attach event listeners when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+  attachEventListeners();
+});
+</script>
 
 
 

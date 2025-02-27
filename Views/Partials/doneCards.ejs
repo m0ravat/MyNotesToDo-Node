@@ -7,23 +7,23 @@
       <div class="bg-cyan-400 rounded-lg border-2 border-black flex flex-col justify-between h-72" id="card-<%= card._id %>">
         <!-- Title Section -->
         <div class="p-2 border-b-2 border-black">
-          <div class="font-semibold text-gray-800 p-2 text-lg" contenteditable="true">
+          <div class="font-semibold text-gray-800 p-2 text-lg title">
             <%= card.title || "Untitled" %>
           </div>
         </div>
         
         <!-- Description in the Middle -->
-        <div class="p-3 flex-grow" contenteditable="true">
-          <%= card.description ? card.description.replace(/\n/g, '<br>') : "" %>
+        <div class="p-3 flex-grow para">
+          <%= card.description %>
         </div>
         
         <!-- Priority Select and Action Buttons at the Bottom -->
-        <div class="flex items-center justify-between p-3 border-t-2 border-black">
+        <div class="flex items-center justify-between p-3 border-t-2 border-black save" data-card-id="<%= card._id %>">
           <div class="flex space-x-3">
-            <button class="p-1.5 bg-green-500 text-white rounded-md hover:bg-green-600">
+            <button class="p-1.5 bg-green-500 text-white rounded-md hover:bg-green-600 check" data-card-id="<%= card._id %>">
               <span class="material-symbols-outlined text-lg">check</span>
             </button>
-            <button class="p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600">
+            <button class="p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600 deletez" data-card-id="<%= card._id %>">
               <span class="material-symbols-outlined text-lg">delete</span>
             </button>
           </div>
@@ -34,3 +34,45 @@
 <% } else { %>
   <p class="text-gray-500">No tasks to display.</p>
 <% } %>
+<script>
+
+  document.querySelectorAll('.check').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      const cardId = button.getAttribute('data-card-id'); // Use `button` instead of `this`
+      const cardElement = document.getElementById(`card-${cardId}`);
+      // Extract the updated title and description from the card
+      const title = cardElement.querySelector('.title').innerText;
+      const description = cardElement.querySelector('.para').innerHTML; // Convert <br> back to newlines
+
+      // Prepare the body of the request
+      const body = JSON.stringify({
+        title: title,
+        description: description,
+        priority: 1, // Ensure priority is a number
+        done: false, // Mark the card as done
+      });
+      console.log(body);
+      // Send the PUT request
+      try{
+        const response = await fetch(`/project/${parentProject}/${cardId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      });
+
+      // Reload the page if the request is successful
+      if (response.ok) {
+        console.log('Card updated successfully');
+        window.location.href = `/project/${parentProject}`;      
+      } else {
+        console.error('Failed to update the card');
+      }
+      } catch(err){
+        console.error(err);
+      }
+    });
+
+  });
+</script>
