@@ -225,7 +225,7 @@ h1{
     }
 }
 
-.material-symbols-outlined {
+.material-symbols-outlined.out {
     font-size: 50px;
     color: #3fffb9;
     border-radius: 30%;
@@ -243,7 +243,7 @@ span.small{
 .delete:hover, .tick:hover{
     cursor: pointer;
 }
-.delete, .tick{
+.delete.out, .tick.out{
     background-color: black;
     border: 2px solid white;
     position: absolute;

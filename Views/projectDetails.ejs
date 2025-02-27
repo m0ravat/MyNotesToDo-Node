@@ -10,22 +10,23 @@
             <div id="para" contenteditable="true"><%= description %></div>
             <div id="icon-container" class="hidden fixed bottom-0 right-0 mb-2 mr-16 space-y-2">
                 <button id="save" class="absolute -left-24 bottom-0">
-                    <span class="material-symbols-outlined">save</span>
+                    <span class="material-symbols-outlined out">save</span>
                 </button>
                 <button id="delete" class="absolute -top-36 -left-12" data-project-id="<%= id %>">
-                    <span class="material-symbols-outlined">delete</span>
+                    <span class="material-symbols-outlined out">delete</span>
                 </button>
                 <button id="pen" class="absolute -top-32 -left-20">
-                    <span class="material-symbols-outlined">stylus</span>
+                    <span class="material-symbols-outlined out">stylus</span>
                 </button>
             </div>
+            <%- include("./Partials/notDoneCards.ejs") %>
 
-            <h1> > Active To Dos </h1>
-            <div class="container" id="c1"></div>
-            <h1> > Finished To Dos </h1>
+            <%- include("./partials/doneCards.ejs") %>
+
+            
             <div class="container" id="c2"></div>
             <div class="fixed bottom-0 right-0  mb-6 mr-8">
-                <button id="opt"><span class="material-symbols-outlined">list</span></button>
+                <button id="opt"><span class="material-symbols-outlined out">list</span></button>
             </div>
         <% } else{ %>
             <h1>Project not found</h1>
@@ -67,6 +68,7 @@
                     });
                     if (response.ok){
                         console.log("Project updated");
+                        window.location.href = window.location.href;
                     } else {
                         console.error("Failed to update project");
                     }
@@ -99,21 +101,10 @@
                 iconContainer.style.display = 'none';
                 const form = document.getElementById('form');
                 form.style.display = 'block';
-                toggleBlurClass(document.querySelector('main'));
 
             });
-            document.getElementById("close").addEventListener('click', function(){
-                document.getElementById('form').style.display = 'none';
-                document.querySelector('main').classList.remove('blur');});
-        });
-        function toggleBlurClass(element) {
-            const mediaQuery = window.matchMedia('(min-width: 600px)');
 
-            // Check if the screen width is 600px or larger
-            if (mediaQuery.matches) {
-                element.classList.add('blur'); // Add the blur class
-            }
-        }
+        });
  
     </script>
 </body>

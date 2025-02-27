@@ -1,4 +1,4 @@
-<form action="/card/create" method="POST" 
+<form method="POST" id="cardForm"
 class="bg-white text-black border-2 border-black rounded-lg shadow-lg fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8"
 style="width: 90%; max-width: 500px; height: auto;">
     <h2 class="text-2xl font-bold mb-6 text-center">Create a New Card</h2>
@@ -49,8 +49,44 @@ style="width: 90%; max-width: 500px; height: auto;">
     </div>
 
     <!-- Submit Button -->
-    <button type="submit" 
+    <button type="submit"  id="submit"
             class="w-full bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
         Create
     </button>
 </form>
+<script>
+    const parentProject = window.location.pathname.split('/')[2]; // Get project ID from URL
+    document.getElementById('cardForm').action = `/project/${parentProject}/createCard`;
+
+    document.getElementById("submit").addEventListener('click', async function() {
+        event.preventDefault();
+        const title = document.getElementById("title").value;
+        const description = document.getElementById("description").value;
+        const priority = document.getElementById("priority").value;
+        const done = document.querySelector('input[name="done"]:checked').value;
+        try{
+            const response = await fetch(`/project/${parentProject}/createCard`, {
+                method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: title,
+                description: description,
+                priority: priority,
+                done: done,
+                parentProject: parentProject
+            })
+        });
+        if (response.ok){
+            console.log("Card created");
+            form.style.display = 'none';
+            window.location.href = window.location.href;
+        } else {
+            console.error("Failed to create card");
+        }
+    } catch (error) {
+        console.error(error);
+    }
+    });
+</script>

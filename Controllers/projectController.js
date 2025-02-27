@@ -25,7 +25,9 @@ const projectGetDetails = (req, res) => {
         title: res.locals.project.title,
         projectTitle: res.locals.project.title,
         description: res.locals.project.description,
-        id: res.locals.project._id
+        id: res.locals.project._id,
+        doneCards: res.locals.doneCards,
+        notDoneCards: res.locals.notDoneCards
     });
 };
 
@@ -57,11 +59,11 @@ const projectUpdate = async (req, res) => {
             { title: title, description: description },
             { new: true }
         )
+        res.json(project);
     } catch (err){
         const errors = handleErrors(err);
         res.status(400).json({ errors });  // Send back errors if any
     }
-
 }
 const projectDelete = async (req, res) => {
     const { id } = req.params;

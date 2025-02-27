@@ -8,7 +8,7 @@ require('dotenv').config();
 
 const app = express();
 const dbURI = "mongodb+srv://m0ravat:Langdon1%4012@mynotestodo.heq52.mongodb.net/MyNotesToDo?retryWrites=true&w=majority";
-const {requireAuth, checkUser} = require('./Middleware/authMiddleware');
+const {requireAuth, checkUser, checkProject} = require('./Middleware/authMiddleware');
 mongoose.connect(dbURI)
   .then(result => app.listen(3000, () => console.log('Server is running on port 3000')))
   .catch(err => console.log(err));
@@ -46,7 +46,6 @@ app.get("/read-cookies", (req,res) =>{
 
 // routes
 app.get('/*', checkUser);
-
 app.get('/', (req, res) => {
   res.render("index", {title: "Home Page"});
 });

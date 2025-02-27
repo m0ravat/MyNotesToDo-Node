@@ -1,6 +1,32 @@
 const jwt = require('jsonwebtoken');
 const User = require('../Models/user');
 const Project = require('../Models/project');
+const Card = require('../Models/card');
+const checkProject = async (req,res,next) =>{
+    try {
+        // Extract project ID from the URL parameter
+        const projectId = req.params.id;
+
+        // Check if the project exists
+        const project = await Project.findById(projectId).populate('cards');
+
+        // Fetch and split cards associated with the project by `done` status
+        const doneCards = project.cards.filter(card => card.done === true);
+        const notDoneCards = project.cards.filter(card => card.done === false);
+
+        // Attach the results to the response object, so you can access them later
+        res.locals.doneCards = doneCards;
+        res.locals.notDoneCards = notDoneCards;
+
+        // Proceed to the next middleware or route handler
+        next();
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+
+}
 const requireAuth = (req,res,next) => {
     const token = req.cookies.jwt;
 
@@ -68,4 +94,4 @@ const validateProject = async (req, res, next) => {
     }
 };
 
-module.exports= {requireAuth, checkUser, validateProject, laog}
+module.exports= {requireAuth, checkUser, validateProject, laog, checkProject}
