@@ -7,17 +7,17 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const app = express();
-const axios = require('axios');
 
-axios.get('https://api64.ipify.org?format=json')
-  .then(response => console.log("Koyeb Public IP:", response.data.ip))
-  .catch(error => console.error("Error fetching IP:", error));
 
 const dbURI = process.env.DB_LINK;
 const {requireAuth, checkUser, checkProject} = require('./Middleware/authMiddleware');
 mongoose.connect(dbURI)
-  .then(result => app.listen(3000, () => console.log('Server is running on port 3000')))
+  .then(result => {
+    const port = process.env.PORT || 3000;  // Use environment variable or fallback to 3000 for local development
+    app.listen(port, () => console.log(`Server is running on port ${port}`));
+  })
   .catch(err => console.log(err));
+
 
 app.set('view engine', 'ejs');
 app.use(express.json());
