@@ -7,6 +7,12 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const app = express();
+const axios = require('axios');
+
+axios.get('https://api64.ipify.org?format=json')
+  .then(response => console.log("Koyeb Public IP:", response.data.ip))
+  .catch(error => console.error("Error fetching IP:", error));
+
 const dbURI = process.env.DB_LINK;
 const {requireAuth, checkUser, checkProject} = require('./Middleware/authMiddleware');
 mongoose.connect(dbURI)
