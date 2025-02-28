@@ -5,6 +5,8 @@ const userRouter = require('./Routes/userRoutes');
 const projectRouter = require('./Routes/projectRoutes');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
+const path = require('path');
+
 
 const app = express();
 
@@ -19,7 +21,9 @@ mongoose.connect(dbURI)
   .catch(err => console.log(err));
 
 
-app.set('view engine', 'ejs');
+  app.set('view engine', 'ejs');
+  app.set('views', path.join(__dirname, 'Views'));
+  
 app.use(express.json());
 
 app.use(express.static('public'));
