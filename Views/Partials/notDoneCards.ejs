@@ -4,18 +4,19 @@
 <% if (notDoneCards && notDoneCards.length > 0) { %>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
     <% notDoneCards.forEach((card) => { %>
-      <div class="bg-amber-400 rounded-lg border-t-2 border-amber-500 flex flex-col justify-between h-72" id="card-<%= card._id %>">
+      <div class="rounded-lg border-t-2 border-amber-500 flex flex-col justify-between h-72 card" 
+           id="card-<%= card._id %>" 
+           data-priority="<%= card.priority %>">
         <!-- Title Section -->
         <div class="p-2 border-b-2 border-black">
-            <div class="font-semibold text-gray-800 p-2 text-lg title" contenteditable="true">
-              <%= card.title || "Untitled" %>
-            </div>
+          <div class="font-semibold text-gray-800 p-2 text-lg title" contenteditable="true">
+            <%= card.title || "Untitled" %>
           </div>
+        </div>
         
         <!-- Description in the Middle -->
-         <div class="unique" style="display: none;"><%= card.done  %>
-         </div>
-        <div class="p-3 flex-grow para " style="overflow-y: scroll;" contenteditable="true">
+        <div class="unique" style="display: none;"><%= card.done %></div>
+        <div class="p-3 flex-grow para" style="overflow-y: scroll;" contenteditable="true">
           <%= card.description %>
         </div>
         
@@ -24,7 +25,7 @@
             <label for="priority-<%= card._id %>" class="text-gray-700 mr-2">Priority:</label>
             <select 
               id="priority-<%= card._id %>" 
-              class="p-1 border border-gray-300 rounded text-sm bg-white"
+              class="p-1 border border-gray-300 rounded text-sm bg-white select"
             >
               <option value="1" <%= card.priority === 1 ? 'selected' : '' %>>1</option>
               <option value="2" <%= card.priority === 2 ? 'selected' : '' %>>2</option>
@@ -51,125 +52,165 @@
 <% } %>
 
 <script>
+// Function to set the background color based on priority
+function setCardBackgroundColor(cardElement) {
+  const priority = parseInt(cardElement.getAttribute('data-priority'));
+  
+  // Remove existing background color classes
+  cardElement.classList.remove('bg-green-500', 'bg-amber-500', 'bg-red-600');
+  
+  // Apply the new background color based on priority
+  switch (priority) {
+    case 1:
+      cardElement.classList.add('bg-green-500');
+      break;
+    case 2:
+      cardElement.classList.add('bg-amber-500'); 
+      break;
+    case 3:
+      cardElement.classList.add('bg-red-600'); 
+      break;
+    default:
+      // Default fallback color if priority is not 1, 2, or 3
+      cardElement.classList.add('bg-cyan-400');
+  }
+}
+
+// Function to attach event listeners
 function attachEventListeners() {
-  // Attach event listeners to .check buttons
-  document.querySelectorAll('.check').forEach((button) => {
-    button.addEventListener('click', async (event) => {
-      const cardId = button.getAttribute('data-card-id');
+  // Set background colors for all cards on page load
+  document.querySelectorAll('[id^="card-"]').forEach((cardElement) => {
+    setCardBackgroundColor(cardElement);
+  });
+
+  // Priority select change event
+  document.querySelectorAll('.select').forEach((select) => {
+    select.addEventListener('change', (event) => {
+      const cardId = select.id.replace('priority-', '');
       const cardElement = document.getElementById(`card-${cardId}`);
 
-      if (!cardElement) {
-        console.error(`Card element with ID "card-${cardId}" not found`);
-        return;
-      }
-
-      // Extract the updated title and description from the card
-      const title = cardElement.querySelector('.title').innerText;
-      const description = cardElement.querySelector('.para').innerHTML;
-      const priority = cardElement.querySelector(`#priority-${cardId}`).value;
-
-      // Prepare the body of the request
-      const body = JSON.stringify({
-        title: title,
-        description: description,
-        priority: parseInt(priority), // Ensure priority is a number
-        done: true, // Mark the card as done
-      });
-
-      // Send the PUT request
-      try {
-        const response = await fetch(`/project/${parentProject}/${cardId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: body,
-        });
-
-        // Reload the page if the request is successful
-        if (response.ok) {
-          console.log('Card updated successfully');
-          window.location.href = `/project/${parentProject}`;
-        } else {
-          console.error('Failed to update the card');
-        }
-      } catch (err) {
-        console.error(err);
+      if (cardElement) {
+        // Update the data-priority attribute
+        cardElement.setAttribute('data-priority', select.value);
+        // Update background color immediately
+        setCardBackgroundColor(cardElement);
       }
     });
   });
-  document.querySelectorAll('.deletez').forEach((button) => {
+
+  // Mark as done (check button)
+  document.querySelectorAll('.check').forEach((button) => {
     button.addEventListener('click', async (event) => {
-      const cardId = button.getAttribute('data-card-id');
-      const cardElement = document.getElementById(`card-${cardId}`);
-
-      if (!cardElement) {
-        console.error(`Card element with ID "card-${cardId}" not found`);
-        return;
-      }
-
-      // Send the DELETE request
       try {
-        const response = await fetch(`/project/${parentProject}/${cardId}`, {
-          method: 'DELETE',
-        });
-
-        // Reload the page if the request is successful
-        if (response.ok) {
-          console.log('Card deleted successfully');
-          window.location.href = `/project/${parentProject}`;
-        } else {
-          console.error('Failed to delete the card');
+        const cardId = button.getAttribute('data-card-id');
+        const cardElement = document.getElementById(`card-${cardId}`);
+        
+        if (!cardElement) {
+          console.error(`Card element with ID "card-${cardId}" not found`);
+          return;
         }
-      } catch (err) {
-        console.error(err);
-      }
-    })
-  })
-  // Attach event listeners to .save buttons
-  document.querySelectorAll('.save').forEach((button) => {
-    button.addEventListener('click', async (event) => {
-      const cardId = button.getAttribute('data-card-id');
-      const cardElement = document.getElementById(`card-${cardId}`);
 
-      if (!cardElement) {
-        console.error(`Card element with ID "card-${cardId}" not found`);
-        return;
-      }
+        // Extract the updated title and description from the card
+        const title = cardElement.querySelector('.title').innerText.trim();
+        const description = cardElement.querySelector('.para').innerHTML.trim();
+        const priority = parseInt(cardElement.querySelector(`#priority-${cardId}`).value);
 
-      // Extract the updated title and description from the card
-      const title = cardElement.querySelector('.title').innerText;
-      const description = cardElement.querySelector('.para').innerHTML;
-      const priority = cardElement.querySelector(`#priority-${cardId}`).value;
-      const done = cardElement.querySelector('.unique').innerHTML;
-
-      // Prepare the body of the request
-      const body = JSON.stringify({
-        title: title,
-        description: description,
-        priority: parseInt(priority), // Ensure priority is a number
-        done: done === 'true', // Convert string to boolean
-      });
-
-      // Send the PUT request
-      try {
+        // Prepare the body of the request
         const response = await fetch(`/project/${parentProject}/${cardId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: body,
+          body: JSON.stringify({
+            title,
+            description,
+            priority,
+            done: true  // Mark the card as done
+          })
         });
 
-        // Reload the page if the request is successful
         if (response.ok) {
-          console.log('Card updated successfully');
-          window.location.href = `/project/${parentProject}`;
+          console.log('Card marked as done successfully');
+          window.location.reload();
         } else {
-          console.error('Failed to update the card');
+          console.error('Failed to mark card as done:', await response.text());
         }
       } catch (err) {
-        console.error(err);
+        console.error('Error marking card as done:', err);
+      }
+    });
+  });
+
+  // Delete card
+  document.querySelectorAll('.deletez').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      try {
+        const cardId = button.getAttribute('data-card-id');
+        
+        const response = await fetch(`/project/${parentProject}/${cardId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          console.log('Card deleted successfully');
+          window.location.reload();
+        } else {
+          console.error('Failed to delete card:', await response.text());
+        }
+      } catch (err) {
+        console.error('Error deleting card:', err);
+      }
+    });
+  });
+
+  // Save card
+  document.querySelectorAll('.save').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      try {
+        const cardId = button.getAttribute('data-card-id');
+        const cardElement = document.getElementById(`card-${cardId}`);
+        
+        if (!cardElement) {
+          console.error(`Card element with ID "card-${cardId}" not found`);
+          return;
+        }
+
+        // Extract the updated title and description from the card
+        const title = cardElement.querySelector('.title').innerText.trim();
+        const description = cardElement.querySelector('.para').innerHTML.trim();
+        const priority = parseInt(cardElement.querySelector(`#priority-${cardId}`).value);
+        const doneElement = cardElement.querySelector('.unique');
+        const done = doneElement ? doneElement.innerHTML.trim() === 'true' : false;
+
+        // Prepare the body of the request
+        const response = await fetch(`/project/${parentProject}/${cardId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title,
+            description,
+            priority,
+            done
+          })
+        });
+
+        if (response.ok) {
+          console.log('Card saved successfully');
+          // Show a temporary visual confirmation without reloading
+          const saveButton = cardElement.querySelector('.save');
+          const originalBackground = saveButton.style.backgroundColor;
+          saveButton.style.backgroundColor = '#4CAF50'; // Green
+          
+          setTimeout(() => {
+            saveButton.style.backgroundColor = originalBackground;
+          }, 1000);
+        } else {
+          console.error('Failed to save card:', await response.text());
+        }
+      } catch (err) {
+        console.error('Error saving card:', err);
       }
     });
   });
