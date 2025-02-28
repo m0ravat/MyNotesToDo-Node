@@ -5,9 +5,11 @@
     "main": "app.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node app.js",
+        "build": "npm run build:css",
         "build:css": "postcss public/styles.css -o public/output.css",
-        "dev": "npx tailwindcss -i public/styles.css -o public/output.css --watch"
+        "start": "node app.js",
+        "dev": "npx tailwindcss -i public/styles.css -o public/output.css --watch",
+        "deploy": "npm run build:css && node app.js"
     },
     "repository": {
         "type": "git",
