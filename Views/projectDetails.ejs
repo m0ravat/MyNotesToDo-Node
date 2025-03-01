@@ -2,7 +2,7 @@
     <%- include("Partials/head") %>
 <body>
     <%- include("Partials/NavigationBars/nav") %>
-    <div style="display: none;" id="form"><%- include ('./Partials/cardForm.ejs') %></div>
+    <div style="display: none;" id="form"><%- include ('/Partials/cardForm.ejs') %></div>
 
     <main class="" id="content">
         <% if (project){ %>
@@ -19,9 +19,9 @@
                     <span class="material-symbols-outlined out">stylus</span>
                 </button>
             </div>
-            <%- include("./Partials/notDoneCards.ejs") %>
+            <%- include("/Partials/notDoneCards.ejs") %>
 
-            <%- include("./partials/doneCards.ejs") %>
+            <%- include("/partials/doneCards.ejs") %>
 
             
             <div class="container" id="c2"></div>
