@@ -9,8 +9,14 @@ const path = require('path');
 
 
 const app = express();
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'Views'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
-
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
+app.use(cookieParser());
 const dbURI = process.env.DB_LINK;
 const {requireAuth, checkUser, checkProject} = require('./Middleware/authMiddleware');
 mongoose.connect(dbURI)
@@ -21,15 +27,9 @@ mongoose.connect(dbURI)
   .catch(err => console.log(err));
 
 
-  app.set('view engine', 'ejs');
-  app.set('views', path.join(__dirname, 'Views'));
-  
-app.use(express.json());
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
-app.use(cookieParser());
+
+
 app.use((req, res, next) => {
   res.locals.path = req.path;
   next();
