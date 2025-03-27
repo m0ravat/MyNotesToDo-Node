@@ -3,7 +3,8 @@
 
 <body>
   <%- include("Partials/NavigationBars/nav") %>
-  <div class="create-blog content">
+  <main id="content">
+    <div class="create-blog content">
       <form method="POST" action="/signup">
         <label for="username">Username: </label>
         <input type="text" name="username" id="username">
@@ -17,6 +18,8 @@
         <button>Submit</button>
       </form>
     </div>
+  </main>
+
     <script>
       const form = document.querySelector('form');
       const emailError = document.querySelector('.email.error');

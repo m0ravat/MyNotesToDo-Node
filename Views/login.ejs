@@ -3,18 +3,20 @@
 
 <body>
   <%- include("Partials/NavigationBars/nav") %>
+  <main id="content">
+    <div class="create-blog content">
+      <form action="/login">
+        <label for="email">Email : </label>
+        <input type="text" id="email" name="email" required>
+        <div class="email error"></div>
+        <label for="password">Password : </label>
+        <input type="text" id="password" name="password" required>
+        <div class="password error"></div>
+        <button>Submit</button>
+      </form>
+    </div>
+  </main>
 
-  <div class="create-blog content">
-    <form action="/login">
-      <label for="email">Email : </label>
-      <input type="text" id="email" name="email" required>
-      <div class="email error"></div>
-      <label for="password">Password : </label>
-      <input type="text" id="password" name="password" required>
-      <div class="password error"></div>
-      <button>Submit</button>
-    </form>
-  </div>
   <script>
     const form = document.querySelector('form');
     const emailError = document.querySelector('.email.error');
