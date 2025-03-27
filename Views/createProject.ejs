@@ -3,19 +3,22 @@
 
   <body>
     <%- include("Partials/NavigationBars/nav") %>
-    <div class="create-blog content">
-      <form action="/project/create">
-        <label for="title">Project Title: </label>
-        <input type="text" name="title" id="title" required>
-        <div class="title error overflow-hidden"></div>
-        
-        <label for="description">Project Description: </label>
-        <textarea name="description" id="description" required></textarea>
-        <div class="description error"></div>
-        
-        <button>Submit</button>
-      </form>
-    </div>
+    <main id="content">
+      <div class="create-blog content">
+        <form action="/project/create">
+          <label for="title">Project Title: </label>
+          <input type="text" name="title" id="title" required>
+          <div class="title error overflow-hidden"></div>
+          
+          <label for="description">Project Description: </label>
+          <textarea name="description" id="description" required></textarea>
+          <div class="description error"></div>
+          
+          <button>Submit</button>
+        </form>
+      </div>
+    </main>
+
     <script>
       const form = document.querySelector('form');
       const titleError = document.querySelector('.title.error');
