@@ -110,7 +110,7 @@
                     if (response.ok) {
                         console.log("Project deleted");
 
-                        socket.emit('projectDeleted', { projectId, title: headerValue, });
+                        socket.emit('projectDeleted', { projectId });
 
                         // Redirect the deleter
                         window.location.href = '/';
@@ -125,9 +125,9 @@
             // Realtime deletion handler
             socket.on('projectDeleted', (data) => {
                 if (data.projectId === projectId) {
-                    console.warn(data.title+ ' was deleted by another user.');
+                    console.warn('A project was deleted by another user.');
                     if (document.hasFocus()) {
-                        alert(data.title + ' was deleted by another user.');
+                        alert('A project was deleted by another user.');
                     }
                     window.location.href = '/';
                 }
