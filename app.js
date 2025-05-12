@@ -6,9 +6,29 @@ const projectRouter = require('./Routes/projectRoutes');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const path = require('path');
-
+const { createServer } = require('node:http');
+const { Server } = require("socket.io");
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
+io.on('connection', (socket) => {
+    console.log('A user connected');
+
+    socket.on('projectUpdated', (data) => {
+        // Broadcast to everyone *except* the one who made the update
+        socket.broadcast.emit('projectUpdated', data);
+    });
+    socket.on('projectDeleted', (data) => {
+        // Broadcast to all *except* the one who deleted
+        socket.broadcast.emit('projectDeleted', data);
+    });
+
+    
+    socket.on('disconnect', () => {
+        console.log('A user disconnected');
+    });
+});
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'Views'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -21,11 +41,12 @@ app.use(cookieParser());
 const dbURI = process.env.DB_LINK;
 const {requireAuth, checkUser, checkProject} = require('./Middleware/authMiddleware');
 mongoose.connect(dbURI)
-  .then(result => {
-    const port = process.env.PORT || 3000;  // Use environment variable or fallback to 3000 for local development
-    app.listen(port, () => console.log(`Server is running on port ${port}`));
+  .then(() => {
+    const port = process.env.PORT || 3000;
+    server.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
   })
-  .catch(err => console.log(err));
 
 
 

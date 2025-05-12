@@ -36,6 +36,9 @@
         <% } %>
     </main>
     <script>
+        const socket = io();
+        const projectId = "<%= id %>";  // Global project ID
+
         document.addEventListener('DOMContentLoaded', function() {
             const optButton = document.getElementById('opt');
             const iconContainer = document.getElementById('icon-container');
@@ -47,30 +50,35 @@
             const para = document.getElementById('para');
 
             optButton.addEventListener('click', function() {
-                if (iconContainer.style.display === 'none' || iconContainer.style.display === '') {
-                    iconContainer.style.display = 'block';
-                } else {
-                    iconContainer.style.display = 'none';
-                }
+                iconContainer.style.display = 
+                    (iconContainer.style.display === 'none' || iconContainer.style.display === '') 
+                    ? 'block' : 'none';
             });
 
+            // Save handler
             saveButton.addEventListener('click', async function(){
                 const headerValue = header.innerText;
                 const paraValue = para.innerText;
-                const projectId = "<%=id  %>";
-                try{
+
+                try {
                     const response = await fetch(`/project/${projectId}`, {
                         method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             title: headerValue,
                             description: paraValue,
                         }),
                     });
-                    if (response.ok){
+
+                    if (response.ok) {
                         console.log("Project updated");
+
+                        socket.emit('projectUpdated', {
+                            projectId,
+                            title: headerValue,
+                            description: paraValue
+                        });
+
                         window.location.href = window.location.href;
                     } else {
                         console.error("Failed to update project");
@@ -79,27 +87,52 @@
                     console.error(error);
                 }
             });
-            deleteButton.addEventListener('click', async function() {
-                const projectId = deleteButton.getAttribute('data-project-id');
 
-                const userConfirmed = confirm("Are you sure you want to delete this project?");
-                if (userConfirmed) {
-                    const projectId = "<%=id  %>";
-                    try {
-                        const response = await fetch(`/project/${projectId}`, {
-                            method: 'DELETE',
-                        });
-                        if (response.ok) {
-                            console.log("Project deleted");
-                            window.location.href = '/';
-                        } else {
-                            console.error("Failed to delete project");
-                        }
-                    } catch (error) {
-                        console.error("Error deleting project:", error);
-                    }
+            // Realtime update handler
+            socket.on('projectUpdated', (data) => {
+                if (data.projectId === projectId) {
+                    header.innerText = data.title;
+                    para.innerText = data.description;
+                    console.log('Project updated in real-time');
                 }
-            });            
+            });
+
+            // Delete handler
+            deleteButton.addEventListener('click', async function() {
+                const userConfirmed = confirm("Are you sure you want to delete this project?");
+                if (!userConfirmed) return;
+
+                try {
+                    const response = await fetch(`/project/${projectId}`, {
+                        method: 'DELETE',
+                    });
+
+                    if (response.ok) {
+                        console.log("Project deleted");
+
+                        socket.emit('projectDeleted', { projectId });
+
+                        // Redirect the deleter
+                        window.location.href = '/';
+                    } else {
+                        console.error("Failed to delete project");
+                    }
+                } catch (error) {
+                    console.error("Error deleting project:", error);
+                }
+            });
+
+            // Realtime deletion handler
+            socket.on('projectDeleted', (data) => {
+                if (data.projectId === projectId) {
+                    console.warn('This project was deleted by another user.');
+                    if (document.hasFocus()) {
+                        alert('This project was deleted by another user.');
+                    }
+                    window.location.href = '/';
+                }
+            });
+
             penButton.addEventListener('click', function(){
                 iconContainer.style.display = 'none';
                 const form = document.getElementById('form');
