@@ -110,7 +110,7 @@
                     if (response.ok) {
                         console.log("Project deleted");
 
-                        socket.emit('projectDeleted', { projectId });
+                        socket.emit('projectDeleted', { projectId, title: headerValue, });
 
                         // Redirect the deleter
                         window.location.href = '/';
