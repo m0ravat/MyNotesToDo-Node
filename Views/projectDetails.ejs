@@ -12,9 +12,6 @@
                 <%- include("Partials/newUserForm") %>  
             <% } %>
             <div id="icon-container" class="hidden fixed bottom-0 right-0 mb-2 mr-16 space-y-2">
-                <button id="save" class="absolute -left-24 bottom-0">
-                    <span class="material-symbols-outlined out">save</span>
-                </button>
                 <button id="delete" class="absolute -top-36 -left-12" data-project-id="<%= id %>">
                     <span class="material-symbols-outlined out">delete</span>
                 </button>
@@ -42,7 +39,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             const optButton = document.getElementById('opt');
             const iconContainer = document.getElementById('icon-container');
-            const saveButton = document.getElementById('save');
             const deleteButton = document.getElementById('delete');
             const penButton = document.getElementById('pen');
 
@@ -56,46 +52,57 @@
             });
 
             // Save handler
-            saveButton.addEventListener('click', async function(){
+            let saveTimeout;
+
+            function autoSave() {
                 const headerValue = header.innerText;
                 const paraValue = para.innerText;
 
-                try {
-                    const response = await fetch(`/project/${projectId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            title: headerValue,
-                            description: paraValue,
-                        }),
-                    });
-
+                fetch(`/project/${projectId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: headerValue,
+                        description: paraValue,
+                    }),
+                })
+                .then(response => {
                     if (response.ok) {
-                        console.log("Project updated");
-
+                        console.log("Project auto-saved");
                         socket.emit('projectUpdated', {
                             projectId,
                             title: headerValue,
                             description: paraValue
                         });
-
-                        window.location.href = window.location.href;
                     } else {
-                        console.error("Failed to update project");
+                        console.error("Auto-save failed");
                     }
-                } catch (error){
-                    console.error(error);
-                }
-            });
+                })
+                .catch(error => {
+                    console.error("Auto-save error:", error);
+                });
+            }
 
-            // Realtime update handler
+            // Debounce logic to avoid rapid saving
+            function debounceAutoSave() {
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(autoSave, 1000); // Save 1s after last edit
+            }
+
+            // Listen for changes while editing
+            header.addEventListener('input', debounceAutoSave);
+            para.addEventListener('input', debounceAutoSave);
+
+            // Real-time update handler
             socket.on('projectUpdated', (data) => {
                 if (data.projectId === projectId) {
                     header.innerText = data.title;
                     para.innerText = data.description;
                     console.log('Project updated in real-time');
+                    alert("Project has been updated by a user, updating format...");
                 }
             });
+
 
             // Delete handler
             deleteButton.addEventListener('click', async function() {
@@ -125,8 +132,9 @@
             // Realtime deletion handler
             socket.on('projectDeleted', (data) => {
                 if (data.projectId === projectId) {
-                    console.warn('A project was deleted by another user.');
                     if (document.hasFocus()) {
+                        alert('This project has been deleted by another user.');
+                    } else{
                         alert('A project was deleted by another user.');
                     }
                     window.location.href = '/';
