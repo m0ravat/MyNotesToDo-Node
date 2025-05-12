@@ -8,6 +8,9 @@
         <% if (project){ %>
             <header contenteditable="true"><%=projectTitle  %></header>
             <div id="para" contenteditable="true"><%= description %></div>
+            <% if(isCreator){ %>
+                <%- include("Partials/newUserForm") %>  
+            <% } %>
             <div id="icon-container" class="hidden fixed bottom-0 right-0 mb-2 mr-16 space-y-2">
                 <button id="save" class="absolute -left-24 bottom-0">
                     <span class="material-symbols-outlined out">save</span>

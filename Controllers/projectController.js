@@ -84,10 +84,42 @@ const projectDelete = async (req, res) => {
     }
 };
 
+
+const projectAddUser = async (req, res) => {
+    const {username, projectID} = req.body;
+    try{
+        const userToAdd = await User.findOne({username});
+        if (!userToAdd){
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const project = await Project.findById(projectID);
+        if (!project) return res.status(404).json({ message: "Project not found" });
+
+        if (project.participants.includes(userToAdd._id)) {
+        return res.status(400).json({ message: "User already added to project" });
+        }
+
+        // Add user to project's participants
+        project.participants.push(userToAdd._id);
+        await project.save();
+
+        userToAdd.projects.push(projectID);
+        await userToAdd.save();
+
+        res.status(200).json({ message: "Project added to user", user: userToAdd });
+    } catch (error) {
+        console.error("Error finding username", error);
+        res.status(500).json({message: "Internal server error"})
+    }
+};
+
+
 module.exports = {
     projectGet, 
     projectPost,
     projectUpdate,
     projectDelete,
-    projectGetDetails
+    projectGetDetails,
+    projectAddUser
 }

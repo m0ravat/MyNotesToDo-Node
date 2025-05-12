@@ -15,7 +15,8 @@ const projectSchema = new Schema({
     maxlength: [100, "Maximum length is 100 characters"],
   },
   cards: [{ type: mongoose.Types.ObjectId, ref: 'Card' }],
-  createdBy: { type: mongoose.Types.ObjectId, ref: 'User', required: true }
+  createdBy: { type: mongoose.Types.ObjectId, ref: 'User', required: true },
+  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 
 
 });
@@ -24,6 +25,7 @@ projectSchema.post('save', function(doc, next){
   console.log("Project was saved to db, ", doc);
   next();
 })
+
 
 
 const Project = mongoose.model('Project', projectSchema);

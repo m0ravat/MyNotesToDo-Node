@@ -1,0 +1,35 @@
+<span>
+    <form method="POST" id="newUser">
+        <label for="addUser">User to add to project: <input type="text" name="addUser" id="addUser" placeholder="Username..."></label>
+        <button type="submit" id="submitUser" >Add user</button>
+    </form>
+</span>
+
+<script>
+    document.getElementById("newUser").action = `/project/${parentProject}/addUser `;
+    document.getElementById("submitUser").addEventListener("click", async function(){
+        event.preventDefault();
+        const username = document.getElementById("addUser").value;
+        try{
+            const response = await fetch(`/project/${parentProject}/addUser`, {
+                method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                projectID: parentProject
+            })
+        });
+        if (response.ok){
+            console.log("User added");
+            form.style.display = 'none';
+            window.location.href = window.location.href;
+        } else {
+            console.error("Failed to add user");
+        }
+    } catch (error) {
+        console.error(error);
+    }
+    });
+</script>

@@ -84,9 +84,17 @@ const validateProject = async (req, res, next) => {
         if (!project) return res.status(404).send('Project not found');
 
         // Correct field name
-        if (!project.createdBy.equals(user._id)) return res.status(403).send('Unauthorized');
+        const isCreator = project.createdBy.equals(user._id);
+        const isParticipant = project.participants.some(participantId =>
+        participantId.equals(user._id)
+        );
+        if (!isCreator && !isParticipant) {
+            return res.status(403).send('Unauthorized updated');
+        }
+
 
         res.locals.project = project;
+        res.locals.isCreator = project.createdBy.equals(user._id);
         next();
     } catch (err) {
         console.log(err.message, "Valid auth");

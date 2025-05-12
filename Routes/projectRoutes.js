@@ -8,6 +8,7 @@ router.get('/:id',validateProject, checkProject, projectController.projectGetDet
 router.post('/create', requireAuth, projectController.projectPost);
 router.put('/:id', projectController.projectUpdate); 
 router.delete('/:id', laog, projectController.projectDelete); 
+router.post("/:id/addUser", checkProject, projectController.projectAddUser);
 
 router.use('/:id/', cardRouter);
 module.exports = router;
