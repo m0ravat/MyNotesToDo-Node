@@ -125,9 +125,9 @@
             // Realtime deletion handler
             socket.on('projectDeleted', (data) => {
                 if (data.projectId === projectId) {
-                    console.warn('This project was deleted by another user.');
+                    console.warn(data.title+ ' was deleted by another user.');
                     if (document.hasFocus()) {
-                        alert('This project was deleted by another user.');
+                        alert(data.title + ' was deleted by another user.');
                     }
                     window.location.href = '/';
                 }
