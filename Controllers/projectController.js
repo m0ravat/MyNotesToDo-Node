@@ -18,10 +18,10 @@ const handleErrors = (err) => {
     return errors;
   };
 const projectGet = (req,res) => {
-    res.render('createProject', {title : "Create A Project"});
+    res.render('Project/createProject', {title : "Create A Project"});
 }
 const projectGetDetails = (req, res) => {
-    res.render('projectDetails', {
+    res.render('Project/projectDetails', {
         title: res.locals.project.title,
         projectTitle: res.locals.project.title,
         description: res.locals.project.description,

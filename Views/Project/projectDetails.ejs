@@ -1,28 +1,30 @@
 <html lang="en">
-    <%- include("Partials/head") %>
+    <%- include("../Partials/head") %>
 <body>
-    <%- include("Partials/NavigationBars/nav") %>
-    <div style="display: none;" id="form"><%- include ('Partials/cardForm') %></div>
+    <%- include("../Partials/nav") %>
+    <div style="display: none;" id="form"><%- include ('Card/cardForm') %></div>
 
     <main class="" id="content">
+        <div id="icon-container" class="hidden fixed bottom-0 right-0 mb-2 mr-16 space-y-2">
+            <% if(isCreator){ %>
+                <button id="person" class="absolute -left-24 bottom-0">
+                    <span class="material-symbols-outlined out">person_add</span>
+                </button>
+            <% } %>
+            <button id="delete" class="absolute -top-36 -left-12" data-project-id="<%= id %>">
+                <span class="material-symbols-outlined out">delete</span>
+            </button>
+            <button id="pen" class="absolute -top-32 -left-20">
+                <span class="material-symbols-outlined out">stylus</span>
+            </button>
+        </div>
         <% if (project){ %>
             <header contenteditable="true"><%=projectTitle  %></header>
             <div id="para" contenteditable="true"><%= description %></div>
-            <% if(isCreator){ %>
-                <%- include("Partials/newUserForm") %>  
-            <% } %>
-            <div id="icon-container" class="hidden fixed bottom-0 right-0 mb-2 mr-16 space-y-2">
-                <button id="delete" class="absolute -top-36 -left-12" data-project-id="<%= id %>">
-                    <span class="material-symbols-outlined out">delete</span>
-                </button>
-                <button id="pen" class="absolute -top-32 -left-20">
-                    <span class="material-symbols-outlined out">stylus</span>
-                </button>
-            </div>
-            <%- include("Partials/notDoneCards.ejs") %>
 
-            <%- include("Partials/doneCards.ejs") %>
-
+            <%- include("newUserForm") %>            
+            <%- include("Card/notDoneCards.ejs") %>
+            <%- include("Card/doneCards.ejs") %>
             
             <div class="container" id="c2"></div>
             <div class="fixed bottom-0 right-0  mb-6 mr-8">
@@ -41,6 +43,7 @@
             const iconContainer = document.getElementById('icon-container');
             const deleteButton = document.getElementById('delete');
             const penButton = document.getElementById('pen');
+            const personButton = document.getElementById('person');
 
             const header = document.querySelector('header');
             const para = document.getElementById('para');
@@ -51,6 +54,9 @@
                     ? 'block' : 'none';
             });
 
+            personButton.addEventListener('click', function(){
+                document.getElementById("addPerson").style.display= "block";
+            });
             // Save handler
             let saveTimeout;
 

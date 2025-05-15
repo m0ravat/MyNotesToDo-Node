@@ -1,6 +1,9 @@
-<span>
+<span id = "addPerson" class="hidden fixed top-1/2 bg-white border-2 border-black left-1/2 transform -translate-x-1/2 -translate-y-1/2">
     <form method="POST" id="newUser">
-        <label for="addUser">User to add to project: <input type="text" name="addUser" id="addUser" placeholder="Username..."></label>
+        <button class="absolute top-2 right-4 text-2xl" id="closeBar">
+            X
+        </button>
+        <label for="addUser">User to add to project: <input type="text" name="addUser" required id="addUser" placeholder="Username..."></label>
         <button type="submit" id="submitUser" >Add user</button>
     </form>
 </span>
@@ -32,4 +35,7 @@
         console.error(error);
     }
     });
+    document.getElementById("closeBar").addEventListener("click", function(){
+        document.getElementById('addPerson').style.display = "none";
+    })
 </script>
