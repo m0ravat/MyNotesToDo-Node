@@ -73,6 +73,8 @@
         console.error(err);
       }
     });
-
   });
+  socket.on("cardUpdated", (card) => {
+    window.location.href = window.location.href;
+  })
 </script>

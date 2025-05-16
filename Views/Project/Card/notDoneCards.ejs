@@ -216,7 +216,53 @@ function attachEventListeners() {
     });
   });
 }
+    socket.on("cardUpdated", (data) => {
+        try {
+            const updatedCard = data.card;
+            const cardElement = document.getElementById(`card-${updatedCard._id}`);
+            
+            if (!cardElement) return;
 
+            // Update Title
+            const titleEl = cardElement.querySelector('.title');
+            if (titleEl && titleEl.innerText !== updatedCard.title) {
+                titleEl.innerText = updatedCard.title;
+            }
+
+            // Update Description
+            const descEl = cardElement.querySelector('.para');
+            if (descEl && descEl.innerHTML !== updatedCard.description) {
+                descEl.innerHTML = updatedCard.description;
+            }
+
+            // Update Priority
+            const prioritySelect = cardElement.querySelector(`#priority-${updatedCard._id}`);
+            if (prioritySelect && parseInt(prioritySelect.value) !== updatedCard.priority) {
+                prioritySelect.value = updatedCard.priority;
+                cardElement.setAttribute('data-priority', updatedCard.priority);
+                setCardBackgroundColor(cardElement); // Reuse your existing function
+            }
+
+            // Update Done Status (hidden field)
+            const doneEl = cardElement.querySelector('.unique');
+            if (doneEl) {
+                doneEl.innerHTML = updatedCard.done.toString();
+            }
+
+        } catch (err) {
+            console.error("Error handling cardUpdated:", err);
+        }
+    });
+socket.on("cardDeleted", (data) => {
+  const cards = document.querySelectorAll('[id^="card-"]');
+  cards.forEach(card => {
+    const cardTitleEl = card.querySelector('.title');
+    if (cardTitleEl && cardTitleEl.innerText === title) {
+      card.remove();
+    }
+  });
+  alert(`The following card has been deleted: ${data.title}`);
+})
 // Attach event listeners when the page loads
 document.addEventListener('DOMContentLoaded', () => {
   attachEventListeners();

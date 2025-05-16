@@ -32,9 +32,19 @@ const cardUpdate = async (req, res) => {
             { title: title, description: description, priority: priority, done: done },
             { new: true }
         )
-        const data = res.json(card);
-        console.log("Card data");
-        console.log(data);
+        const io = req.app.get('io');
+        io.to(card.parentProject.toString()).emit('cardUpdated', {
+            card: {  // Wrap in `card` object
+                _id: req.params.id,
+                title,
+                description,
+                priority,
+                done,
+                parentProject: card.parentProject // Include if frontend needs it
+            }
+        });
+
+        res.json(card);
     } catch (err){
         res.status(400).json(err);  // Send back errors if any
     }
@@ -51,7 +61,11 @@ const cardDelete = async (req, res) => {
 
         // Delete the project
         await Card.findByIdAndDelete(id);
-        res.status(200).json({ message: "card deleted successfully" });
+        const io = req.app.get('io');
+        io.to(card.parentProject.toString()).emit('cardDeleted', {
+            title: card.title
+        });
+        res.status(200).json({ message: "Card deleted successfully" });
     } catch (error) {
         console.error("Error deleting card:", error);
         res.status(500).json({ message: "Internal server error" });
