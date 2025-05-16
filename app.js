@@ -18,6 +18,7 @@ const server = createServer(app);
 const io = new Server(server);
 
 setupSockets(io);
+app.set('io', io);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'Views'));

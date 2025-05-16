@@ -2,7 +2,7 @@
 class="bg-white text-black border-2 border-black rounded-lg shadow-lg fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8"
 style="width: 90%; max-width: 500px; height: auto;">
     <h2 class="text-2xl font-bold mb-6 text-center">Create a New Card</h2>
-    <button class="absolute top-2 right-4 text-2xl" id="close">
+    <button type="button" class="absolute top-2 right-4 text-2xl" id="close">
         X
     </button>
     <!-- Title Input -->
@@ -79,9 +79,14 @@ style="width: 90%; max-width: 500px; height: auto;">
             })
         });
         if (response.ok){
+            const data = await response.json(); // backend should return { user: { username, ... } }
             console.log("Card created");
             form.style.display = 'none';
             window.location.href = window.location.href;
+            socket.emit('cardAdded', {
+                projectId: parentProject,
+                card: data.card
+            })
         } else {
             console.error("Failed to create card");
         }
@@ -89,6 +94,9 @@ style="width: 90%; max-width: 500px; height: auto;">
         console.error(error);
     }
     });
+    socket.on('cardAdded', ({card}) => {
+        alert(`A new card was created: ${card.title}`);
+    })
 
     document.getElementById("close").addEventListener("click", function(){
         document.getElementById('cardForm').style.display = "none";

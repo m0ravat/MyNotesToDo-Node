@@ -52,19 +52,34 @@ const projectPost = async (req, res) => {
 };
 
 const projectUpdate = async (req, res) => {
-    const {title, description} = req.body;
-    try{
-        const project = await Project.findByIdAndUpdate(
-            req.params.id,
-            { title: title, description: description },
-            { new: true }
-        )
-        res.json(project);
-    } catch (err){
-        const errors = handleErrors(err);
-        res.status(400).json({ errors });  // Send back errors if any
+  const { title, description } = req.body;
+  const projectId = req.params.id;
+
+  try {
+    const project = await Project.findByIdAndUpdate(
+      projectId,
+      { title, description },
+      { new: true }
+    );
+
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
     }
-}
+
+    // Emit update to the room (other users)
+    const io = req.app.get('io');
+    io.to(projectId).emit('projectUpdated', {
+      projectId,
+      title: project.title,
+      description: project.description,
+    });
+
+    res.json(project);
+  } catch (err) {
+    console.error('Project update error:', err);
+    res.status(400).json({ error: 'Update failed' });
+  }
+};
 const projectDelete = async (req, res) => {
     const { id } = req.params;
 
@@ -77,6 +92,8 @@ const projectDelete = async (req, res) => {
 
         // Delete the project
         await Project.findByIdAndDelete(id);
+        const io = req.app.get('io');
+        io.to(id).emit('projectDeleted', {id});
         res.status(200).json({ message: "Project deleted successfully" });
     } catch (error) {
         console.error("Error deleting project:", error);
@@ -107,7 +124,7 @@ const projectAddUser = async (req, res) => {
         userToAdd.projects.push(projectID);
         await userToAdd.save();
 
-        res.status(200).json({ message: "Project added to user", user: userToAdd });
+        res.status(200).json({ projectId: projectID, user: userToAdd });
     } catch (error) {
         console.error("Error finding username", error);
         res.status(500).json({message: "Internal server error"})

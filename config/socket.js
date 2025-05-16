@@ -11,24 +11,8 @@ function setupSockets(io) {
       socket.to(projectId).emit('addToProject', { user });
     });
 
-    socket.on('projectUpdated', ({ projectId, ...data }) => {
-      socket.to(projectId).emit('projectUpdated', data);
-    });
-
-    socket.on('projectDeleted', ({ projectId, ...data }) => {
-      socket.to(projectId).emit('projectDeleted', data);
-    });
-
     socket.on('cardAdded', ({ projectId, card }) => {
       socket.to(projectId).emit('cardAdded', { card });
-    });
-
-    socket.on('cardUpdated', ({ projectId, card }) => {
-      socket.to(projectId).emit('cardUpdated', { card });
-    });
-
-    socket.on('cardDeleted', ({ projectId, cardId }) => {
-      socket.to(projectId).emit('cardDeleted', { cardId });
     });
 
     socket.on('disconnect', () => {

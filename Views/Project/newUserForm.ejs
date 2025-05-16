@@ -1,6 +1,6 @@
 <span id = "addPerson" class="hidden fixed top-1/2 bg-white border-2 border-black left-1/2 transform -translate-x-1/2 -translate-y-1/2">
     <form method="POST" id="newUser">
-        <button class="absolute top-2 right-4 text-2xl" id="closeBar">
+        <button type="button" class="absolute top-2 right-4 text-2xl" id="closeBar">
             X
         </button>
         <label for="addUser">User to add to project: <input type="text" name="addUser" required id="addUser" placeholder="Username..."></label>
@@ -9,33 +9,48 @@
 </span>
 
 <script>
-    document.getElementById("newUser").action = `/project/${parentProject}/addUser `;
-    document.getElementById("submitUser").addEventListener("click", async function(){
-        event.preventDefault();
-        const username = document.getElementById("addUser").value;
-        try{
-            const response = await fetch(`/project/${parentProject}/addUser`, {
-                method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: username,
-                projectID: parentProject
-            })
+  const form = document.getElementById("addPerson");
+
+  // Set the form action dynamically
+  document.getElementById("newUser").action = `/project/${projectId}/addUser`;
+
+  // Handle form submission
+  document.getElementById("submitUser").addEventListener("click", async function(event) {
+    event.preventDefault();
+    const username = document.getElementById("addUser").value;
+
+    try {
+      const response = await fetch(`/project/${projectId}/addUser`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: username,
+          projectID: projectId
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json(); // backend should return { user: { username, ... } }
+        console.log("User added:", data);
+        form.style.display = 'none';
+        window.location.href = window.location.href; // Or dynamically update the DOM instead
+        // Emit real-time event to others in the room
+        socket.emit('addedToProject', {
+          projectId: projectId,
+          user: data.user
         });
-        if (response.ok){
-            console.log("User added");
-            form.style.display = 'none';
-            window.location.href = window.location.href;
-        } else {
-            console.error("Failed to add user");
-        }
+      } else {
+        console.error("Failed to add user");
+      }
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
-    });
-    document.getElementById("closeBar").addEventListener("click", function(){
-        document.getElementById('addPerson').style.display = "none";
-    })
+  });
+  socket.on('addToProject', ({ user }) => {
+    alert(`New user added to the project: ${user.username}`);
+  });
+  // Close form on button click
+  document.getElementById("closeBar").addEventListener("click", function () {
+    form.style.display = "none";
+  });
 </script>

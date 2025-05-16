@@ -3,7 +3,10 @@
 <body>
     <%- include("../Partials/nav") %>
     <div style="display: none;" id="form"><%- include ('Card/cardForm') %></div>
-
+    <script>
+        const socket = io();
+        const projectId = "<%= id %>";  // Global project ID
+    </script>
     <main class="" id="content">
         <div id="icon-container" class="hidden fixed bottom-0 right-0 mb-2 mr-16 space-y-2">
             <% if(isCreator){ %>
@@ -35,8 +38,6 @@
         <% } %>
     </main>
     <script>
-        const socket = io();
-        const projectId = "<%= id %>";  // Global project ID
 
         document.addEventListener('DOMContentLoaded', function() {
             const optButton = document.getElementById('opt');
@@ -61,32 +62,25 @@
             let saveTimeout;
 
             function autoSave() {
-                const headerValue = header.innerText;
-                const paraValue = para.innerText;
+            const headerValue = header.innerText;
+            const paraValue = para.innerText;
 
-                fetch(`/project/${projectId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: headerValue,
-                        description: paraValue,
-                    }),
-                })
-                .then(response => {
-                    if (response.ok) {
-                        console.log("Project auto-saved");
-                        socket.emit('projectUpdated', {
-                            projectId,
-                            title: headerValue,
-                            description: paraValue
-                        });
-                    } else {
-                        console.error("Auto-save failed");
-                    }
-                })
-                .catch(error => {
-                    console.error("Auto-save error:", error);
-                });
+            fetch(`/project/${projectId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: headerValue, description: paraValue }),
+            })
+            .then(response => {
+                if (response.ok) {
+                console.log("Project auto-saved");
+                // No client emit here — server will handle notifying others
+                } else {
+                console.error("Auto-save failed");
+                }
+            })
+            .catch(error => {
+                console.error("Auto-save error:", error);
+            });
             }
 
             // Debounce logic to avoid rapid saving
@@ -120,10 +114,6 @@
 
                     if (response.ok) {
                         console.log("Project deleted");
-
-                        socket.emit('projectDeleted', { projectId });
-
-                        // Redirect the deleter
                         window.location.href = '/';
                     } else {
                         console.error("Failed to delete project");
@@ -135,13 +125,13 @@
 
             // Realtime deletion handler
             socket.on('projectDeleted', (data) => {
-                if (data.projectId === projectId) {
+                if (data.id === projectId) {
                     if (document.hasFocus()) {
                         alert('This project has been deleted by another user.');
+                        window.location.href = '/';
                     } else{
                         alert('A project was deleted by another user.');
                     }
-                    window.location.href = '/';
                 }
             });
 
