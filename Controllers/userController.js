@@ -33,7 +33,7 @@ const createToken = (id) =>{
 }
 
 const signupGet = (req, res) => {
-  res.render('signup', { title: 'Create a new user' });
+  res.render('User/signup', { title: 'Create a new user' });
 }
 
 const signupPost = async (req, res) => {
@@ -52,7 +52,7 @@ const signupPost = async (req, res) => {
 }
 
 const loginGet = (req, res) => {
-  res.render('login', {title: "Login Page"});
+  res.render('User/login', {title: "Login Page"});
 }
 
 const loginPost =  async (req, res) => {
